@@ -4,6 +4,7 @@ import com.paymentGateway.PaymentGatewayService.service.PaymentService;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;
 import com.stripe.param.ChargeCreateParams;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -11,6 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class StripeService implements PaymentService {
 
     @Override
@@ -22,6 +24,8 @@ public class StripeService implements PaymentService {
                 .putMetadata("order_id", "6735")
                 .build();
         Charge charge = Charge.create(params);
+        log.info("Stripe payment process created and create method called");
+
         return Map.of( "transcationId",charge.getId(), "status",charge.getStatus(),"createDate", new Date().toString(), "updateDate", new Date().toString());
 
     }

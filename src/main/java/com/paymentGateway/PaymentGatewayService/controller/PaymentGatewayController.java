@@ -5,6 +5,7 @@ import com.paymentGateway.PaymentGatewayService.model.TransactionResponse;
 import com.paymentGateway.PaymentGatewayService.serviceImp.PaymentProcessor;
 import com.paymentGateway.PaymentGatewayService.serviceImp.PaymentServiceFactory;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/v1")
+@Slf4j
 public class PaymentGatewayController {
 
     @Autowired
@@ -25,6 +27,7 @@ public class PaymentGatewayController {
     @PostMapping("/processPayment")
     @Operation(summary = "process the transactions")
     public TransactionResponse processPayment(@RequestBody PaymentDetails paymentDetails) {
+        log.info("payment process initiated");
         CompletableFuture<String> paymentStatus = paymentProcessor.processPayment(paymentDetails);
         // Logic to handle payment processing and integration
         // Return transaction status and confirmation details

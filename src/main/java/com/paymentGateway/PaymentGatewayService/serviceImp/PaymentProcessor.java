@@ -4,6 +4,7 @@ import com.paymentGateway.PaymentGatewayService.model.PaymentDetails;
 import com.paymentGateway.PaymentGatewayService.model.PaymentResponse;
 import com.paymentGateway.PaymentGatewayService.repo.PaymentResponseRepo;
 import com.paymentGateway.PaymentGatewayService.service.PaymentService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @Service
+@Slf4j
 public class PaymentProcessor {
     @Autowired
     private PaymentServiceFactory paymentServiceFactory;
@@ -31,6 +33,8 @@ public class PaymentProcessor {
     @Async
     public CompletableFuture<String> processPayment(PaymentDetails paymentDetails) {
         double amount = currencyConverter.convertCurrency(paymentDetails.getAmount(),paymentDetails.getFromCurrency(),paymentDetails.getToCurrency());
+        log.debug("Processing payment for amount: {}", amount);
+
         PaymentService paymentService = paymentServiceFactory.getPaymentService(paymentDetails.getPaymentMethod());
         try {
             Thread.sleep(5000);
@@ -48,7 +52,9 @@ public class PaymentProcessor {
             paymentResponse.setFullName(paymentDetails.getUserDetails().getCardHolderName());
             paymentResponse.setTransactionId(result.get("transactionId"));
             paymentResponse.setStatus(result.get("status"));
-            paymentResponseRepo.save(paymentResponse);
+            paymentResponse = paymentResponseRepo.save(paymentResponse);
+            log.info("Payment processed successfully with ID: {}", paymentResponse.getId());
+
             return CompletableFuture.completedFuture("Payment processed successfully with details: " + result);
         } catch (InterruptedException e) {
             return CompletableFuture.failedFuture(e);

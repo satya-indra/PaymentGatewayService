@@ -4,6 +4,7 @@ import com.paymentGateway.PaymentGatewayService.service.PaymentService;
 import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class PayPalService implements PaymentService  {
     @Autowired
     private APIContext apiContext;
@@ -46,6 +48,8 @@ public class PayPalService implements PaymentService  {
         redirectUrls.setReturnUrl(successUrl);
         payment.setRedirectUrls(redirectUrls);
         payment = payment.create(apiContext);
+        log.info("paypal payment process created and create method called");
+
         return Map.of("paymentId", payment.getId(), "payer", payment.getPayer().getFundingOptionId());
 
     }
@@ -58,6 +62,8 @@ public class PayPalService implements PaymentService  {
         PaymentExecution paymentExecution = new PaymentExecution();
         paymentExecution.setPayerId(payerId);
         payment = payment.execute(apiContext, paymentExecution);
+        log.info("paypal excute payment method called");
+
         return  Map.of( "transcationId",payment.getId(), "status",payment.getState(),"createDate", payment.getCreateTime(), "updateDate", payment.getUpdateTime());
     }
 }
