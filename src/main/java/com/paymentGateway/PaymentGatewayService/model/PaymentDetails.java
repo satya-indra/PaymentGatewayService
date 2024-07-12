@@ -13,8 +13,11 @@ public class PaymentDetails {
     @DecimalMin(value = "0.01", message = "Amount must be greater than zero")
     private Double amount;
 
-    @NotBlank(message = "Currency is required")
-    private String currency;
+    @NotBlank(message = "To Currency is required")
+    private String toCurrency;
+
+    @NotBlank(message = "From Currency is required")
+    private String fromCurrency;
 
     @NotBlank(message = "Payment method is required")
     private String paymentMethod;

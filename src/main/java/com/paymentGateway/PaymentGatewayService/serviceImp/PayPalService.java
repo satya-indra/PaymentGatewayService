@@ -7,14 +7,16 @@ import com.paypal.base.rest.PayPalRESTException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class PayPalService implements PaymentService  {
     @Autowired
     private APIContext apiContext;
     @Override
-    public Payment createPayment(
+    public Map<String, String> createPayment(
             Double total,
             String currency,
             String method,
@@ -43,16 +45,19 @@ public class PayPalService implements PaymentService  {
         redirectUrls.setCancelUrl(cancelUrl);
         redirectUrls.setReturnUrl(successUrl);
         payment.setRedirectUrls(redirectUrls);
+        payment = payment.create(apiContext);
+        return Map.of("paymentId", payment.getId(), "payer", payment.getPayer().getFundingOptionId());
 
-        return payment.create(apiContext);
     }
+
     @Override
-    public Payment executePayment(String paymentId, String payerId) throws PayPalRESTException {
+    public Map<String,String> executePayment(String paymentId, String payerId) throws PayPalRESTException {
         Payment payment = new Payment();
         payment.setId(paymentId);
 
         PaymentExecution paymentExecution = new PaymentExecution();
         paymentExecution.setPayerId(payerId);
-        return payment.execute(apiContext, paymentExecution);
+        payment = payment.execute(apiContext, paymentExecution);
+        return  Map.of( "transcationId",payment.getId(), "status",payment.getState(),"createDate", payment.getCreateTime(), "updateDate", payment.getUpdateTime());
     }
 }

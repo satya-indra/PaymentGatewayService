@@ -17,7 +17,6 @@ public class CurrencyConverter {
         Map<String, Object> response = restTemplate.getForObject(url, Map.class);
         Map<String, Double> rates = (Map<String, Double>) response.get("rates");
         double rate =  rates.get(toCurrency);
-
         return amount * rate;
     }
 }
